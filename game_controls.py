@@ -12,6 +12,18 @@ def keypress():
     import keyboard
 
     # put your code here
+    while True:
+        if keyboard.is_pressed('w'):
+            pyautogui.press('up')
+
+        elif keyboard.is_pressed('a'):
+            pyautogui.press('left')
+
+        elif keyboard.is_pressed('s'):
+            pyautogui.press('down')
+
+        elif keyboard.is_pressed('d'):
+            pyautogui.press('right')
 
 
 def trackpad_mouse():
