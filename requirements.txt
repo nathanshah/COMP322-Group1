@@ -1,0 +1,8 @@
+numpy
+imutils
+PyAutoGUI
+opencv-python
+pygame
+keyboard
+pynput
+mediapipe
