@@ -48,11 +48,6 @@ def trackpad_mouse():
             current_x = current_position[0]
             current_y = current_position[1]
 
-            print("Last Position: ", end="")
-            print(last_position)
-            print("Current Position: ", end="")
-            print(current_position)
-
             diff_x = current_x - last_position[0]
             diff_y = current_y - last_position[1]
 
@@ -72,12 +67,6 @@ def trackpad_mouse():
                     else:
                         pyautogui.press('left')
                         last_dir = 'left'
-
-                print("Last Position: ", end="")
-                print(last_position)
-                print("Current Position: ", end="")
-                print(current_position, end="")
-                print(last_dir)
 
             last_position = current_position        
 
