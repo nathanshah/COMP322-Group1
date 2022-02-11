@@ -1,4 +1,6 @@
+from turtle import position
 import pyautogui
+import math
 
 last_position = (None,None)
 last_dir = ''
@@ -35,8 +37,49 @@ def trackpad_mouse():
 
     def on_move(x, y):
         # put your code here
-        pass
-        
+        global last_position
+        global last_dir
+
+        if last_position[0] == None or last_position[1] == None:
+            last_position = pyautogui.position()
+
+        else:
+            current_position = pyautogui.position()
+            current_x = current_position[0]
+            current_y = current_position[1]
+
+            print("Last Position: ", end="")
+            print(last_position)
+            print("Current Position: ", end="")
+            print(current_position)
+
+            diff_x = current_x - last_position[0]
+            diff_y = current_y - last_position[1]
+
+            if abs(diff_x) >= 3 or abs(diff_y) >= 3:
+
+                if abs(diff_y) > abs(diff_x): #up down
+                    if diff_y < 0:
+                        pyautogui.press('up')
+                        last_dir = 'up'
+                    else:
+                        pyautogui.press('down')
+                        last_dir = 'down'
+                else: #left right
+                    if diff_x > 0:
+                        pyautogui.press('right')
+                        last_dir = 'right'
+                    else:
+                        pyautogui.press('left')
+                        last_dir = 'left'
+
+                print("Last Position: ", end="")
+                print(last_position)
+                print("Current Position: ", end="")
+                print(current_position, end="")
+                print(last_dir)
+
+            last_position = current_position        
 
     with mouse.Listener(on_move=on_move) as listener:
         listener.join() 
