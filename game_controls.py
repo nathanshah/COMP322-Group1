@@ -82,8 +82,8 @@ def color_tracker():
     import multithreaded_webcam as mw
 
     # You need to define HSV colour range MAKE CHANGE HERE
-    colorLower = None
-    colorUpper = None
+    colorLower = (0,0,0)
+    colorUpper = (50,50,50)
 
     # set the limit for the number of frames to store and the number that have seen direction change
     buffer = 20
@@ -103,8 +103,18 @@ def color_tracker():
 
     while True:
         # your code here
-        continue
         
+        frame = vs.read()
+        cv2.flip(frame,1)
+        imutils.resize(frame, width=600)
+        cv2.GaussianBlur(frame, (5,5), 0)
+        cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        
+        mask = cv2.inRange(frame, colorLower, colorUpper)
+        cv2.erode(mask,None,iterations =2)
+        cv2.dilate(mask,None,iterations =2)
+        
+
 
 
 
