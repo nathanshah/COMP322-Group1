@@ -105,18 +105,52 @@ def color_tracker():
         # your code here
         
         frame = vs.read()
-        cv2.flip(frame,1)
-        imutils.resize(frame, width=600)
-        cv2.GaussianBlur(frame, (5,5), 0)
-        cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        frame = cv2.flip(frame,1)
+        frame = imutils.resize(frame, width=600)
+        frame = cv2.GaussianBlur(frame, (5,5), 0)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
         mask = cv2.inRange(frame, colorLower, colorUpper)
-        cv2.erode(mask,None,iterations =2)
-        cv2.dilate(mask,None,iterations =2)
+        mask = cv2.erode(mask,None,iterations =2)
+        mask = cv2.dilate(mask,None,iterations =2)
         
+        contours, hierarchy = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+        center = None
 
+        if len(contours) > 0:
+            largest_countour = max(list, key= cv2.contourArea)
+            pt, radius = cv2.minEnclosingCircle(largest_countour)
 
+            if radius > 10:
+                pts.appendleft(pt)
+
+                if num_frames >= 10 and len(pts) >= 10:
+                    (dX,dY) = tuple(map(lambda i,j: i-j, pts[0], pts[9] ))
+
+                    if abs(dX) >= 3 or abs(dY) >= 3:
+
+                        if abs(dY) > abs(dX): #up down
+                            if dY < 0:
+                                pyautogui.press('up')
+                                direction = 'up'
+                            else:
+                                pyautogui.press('down')
+                                direction = 'down'
+                        else: #left right
+                            if dX > 0:
+                                pyautogui.press('right')
+                                direction = 'right'
+                            else:
+                                pyautogui.press('left')
+                                direction = 'left'
+
+        cv2.putText(frame, direction, (20.40))
+        cv2.FONT_HERSHEY_SIMPLEX( 1, (0,0,255),3)
+
+        cv2.imshow('Game Control Window', frame)
+        cv2.waitKey(1)
+        num_frames += 1
 
 def finger_tracking():
     import cv2
