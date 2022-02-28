@@ -79,12 +79,12 @@ def color_tracker():
     import numpy as np
     from collections import deque
     import time
-    #import multithreaded_webcam as mw
+    import multithreaded_webcam as mw
     
 
     # You need to define HSV colour range MAKE CHANGE HERE
-    colorLower = (0,0,0)
-    colorUpper = (50,50,50)
+    colorLower = (0,128,128)
+    colorUpper = (255,255,255)
 
     # set the limit for the number of frames to store and the number that have seen direction change
     buffer = 20
@@ -99,27 +99,14 @@ def color_tracker():
     #Sleep for 2 seconds to let camera initialize properly
     time.sleep(2)
     #Start video capture
-    #vs = mw.WebcamVideoStream().start()
 
-    cap = cv2.VideoCapture(0)
-    while cap.isOpened():
-        ret, frame = cap.read()
+    center = None
 
-        cv2.imshow('Webcam', frame)
+    vs = mw.WebcamVideoStream().start()
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-
-    '''
     while True:
-        # your code here
-        
         frame = vs.read()
-        
+
         frame = cv2.flip(frame,1)
         frame = imutils.resize(frame, width=600)
         frame = cv2.GaussianBlur(frame, (5,5), 0)
@@ -128,46 +115,50 @@ def color_tracker():
         mask = cv2.inRange(frame, colorLower, colorUpper)
         mask = cv2.erode(mask,None,iterations =2)
         mask = cv2.dilate(mask,None,iterations =2)
-        
-        contours, hierarchy = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        center = None
+        (contours, hierarchy) = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         if len(contours) > 0:
-            largest_countour = max(list, key= cv2.contourArea)
-            pt, radius = cv2.minEnclosingCircle(largest_countour)
+            max_contour = max(contours, key= cv2.contourArea)
+            (pt, radius) = cv2.minEnclosingCircle(max_contour)
+            M = cv2.moments(max_contour)
+            center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
 
             if radius > 10:
-                pts.appendleft(pt)
-
-                if num_frames >= 10 and len(pts) >= 10:
-                    (dX,dY) = tuple(map(lambda i,j: i-j, pts[0], pts[9] ))
-
-                    if abs(dX) >= 3 or abs(dY) >= 3:
-
-                        if abs(dY) > abs(dX): #up down
-                            if dY < 0:
-                                pyautogui.press('up')
-                                direction = 'up'
-                            else:
-                                pyautogui.press('down')
-                                direction = 'down'
-                        else: #left right
-                            if dX > 0:
-                                pyautogui.press('right')
-                                direction = 'right'
-                            else:
-                                pyautogui.press('left')
-                                direction = 'left'
+                pts.appendleft(center)
         
-        cv2.putText(frame, direction, (20.40))
-        cv2.FONT_HERSHEY_SIMPLEX( 1, (0,0,255),3)
+        if num_frames >= 10 and len(pts) >= 10:
+            (dX,dY) = tuple(map(lambda i,j: i-j, pts[0], pts[9] ))
 
+            if abs(dX) >= 25 or abs(dY) >= 25:
+
+                if abs(dY) > abs(dX): #up down
+                    if dY < 0 and direction != 'up':
+                        pyautogui.press('up')
+                        print("UP\n")
+                        direction = 'up'
+                    elif direction != 'down':
+                        pyautogui.press('down')
+                        print("DOWN\n")
+                        direction = 'down'
+                else: #left right
+                    if dX > 0 and direction != 'right':
+                        pyautogui.press('right')
+                        direction = 'right'
+                        print("RIGHT\n")
+                    elif direction != 'left':
+                        pyautogui.press('left')
+                        print("LEFT\n")
+                        direction = 'left'
+
+        cv2.putText(frame, direction, (20,40), cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),3)
         cv2.imshow('Game Control Window', frame)
-        cv2.waitKey(1)
-        num_frames += 1
+        num_frames +=1
 
-        '''
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+        
 
 def finger_tracking():
     import cv2
