@@ -1,6 +1,6 @@
+from ast import While
 from turtle import position
 import pyautogui
-import math
 
 last_position = (None,None)
 last_dir = ''
@@ -79,7 +79,8 @@ def color_tracker():
     import numpy as np
     from collections import deque
     import time
-    import multithreaded_webcam as mw
+    #import multithreaded_webcam as mw
+    
 
     # You need to define HSV colour range MAKE CHANGE HERE
     colorLower = (0,0,0)
@@ -98,9 +99,22 @@ def color_tracker():
     #Sleep for 2 seconds to let camera initialize properly
     time.sleep(2)
     #Start video capture
-    vs = mw.WebcamVideoStream().start()
+    #vs = mw.WebcamVideoStream().start()
+
+    cap = cv2.VideoCapture(0)
+    while cap.isOpened():
+        ret, frame = cap.read()
+
+        cv2.imshow('Webcam', frame)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 
+    '''
     while True:
         # your code here
         
@@ -153,7 +167,7 @@ def color_tracker():
         cv2.waitKey(1)
         num_frames += 1
 
-        
+        '''
 
 def finger_tracking():
     import cv2
