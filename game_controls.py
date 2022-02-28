@@ -54,17 +54,17 @@ def trackpad_mouse():
             if abs(diff_x) >= 3 or abs(diff_y) >= 3:
 
                 if abs(diff_y) > abs(diff_x): #up down
-                    if diff_y < 0:
+                    if diff_y < 0 and last_dir !='up':
                         pyautogui.press('up')
                         last_dir = 'up'
-                    else:
+                    elif last_dir != 'down':
                         pyautogui.press('down')
                         last_dir = 'down'
                 else: #left right
-                    if diff_x > 0:
+                    if diff_x > 0 and last_dir != 'right':
                         pyautogui.press('right')
                         last_dir = 'right'
-                    else:
+                    elif last_dir != 'left':
                         pyautogui.press('left')
                         last_dir = 'left'
 
@@ -105,6 +105,7 @@ def color_tracker():
         # your code here
         
         frame = vs.read()
+        
         frame = cv2.flip(frame,1)
         frame = imutils.resize(frame, width=600)
         frame = cv2.GaussianBlur(frame, (5,5), 0)
@@ -144,13 +145,15 @@ def color_tracker():
                             else:
                                 pyautogui.press('left')
                                 direction = 'left'
-
+        
         cv2.putText(frame, direction, (20.40))
         cv2.FONT_HERSHEY_SIMPLEX( 1, (0,0,255),3)
 
         cv2.imshow('Game Control Window', frame)
         cv2.waitKey(1)
         num_frames += 1
+
+        
 
 def finger_tracking():
     import cv2
