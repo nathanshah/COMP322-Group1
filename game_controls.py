@@ -176,6 +176,44 @@ def finger_tracking():
     vs = mw.WebcamVideoStream().start()
 
     # put your code here
+    num_fingers = 0
+    landmark_list = []
+
+    first_hands = mp.solutions.hands
+
+    first_hands.Hands(static_image_mode = False, max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+    ability_to_draw = mp.solutions.drawing_utils
+
+    while True:
+        frame = vs.read()
+
+        frame = cv2.flip(frame,1)
+        frame = imutils.resize(frame, width=600)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        results = first_hands.process(frame)
+
+        if not results.multi_hand_world_landmarks:
+            continue
+
+        for hand_item in results.multi_hand_world_landmarks:
+            for id, Im in enumerate(hand_item.landmark):
+
+                (height, width, other) = frame.shape
+                new_x = id * Im.x
+                new_y = id* Im.y
+
+                cv2.circle(frame, (new_x,new_y), 3, (255,0,255), cv2.FILLED)
+                landmark_list.append()
+
+
+
+
+
+
+
+
+
 
 
 def unique_control():
