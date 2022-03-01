@@ -83,8 +83,8 @@ def color_tracker():
     
 
     # You need to define HSV colour range MAKE CHANGE HERE
-    colorLower = (0,128,128)
-    colorUpper = (255,255,255)
+    colorLower = (0,0,0)
+    colorUpper = (187,51,12)
 
     # set the limit for the number of frames to store and the number that have seen direction change
     buffer = 20
@@ -135,20 +135,20 @@ def color_tracker():
                 if abs(dY) > abs(dX): #up down
                     if dY < 0 and direction != 'up':
                         pyautogui.press('up')
-                        print("UP\n")
+                        print("UP")
                         direction = 'up'
                     elif direction != 'down':
                         pyautogui.press('down')
-                        print("DOWN\n")
+                        print("DOWN")
                         direction = 'down'
                 else: #left right
                     if dX > 0 and direction != 'right':
                         pyautogui.press('right')
                         direction = 'right'
-                        print("RIGHT\n")
+                        print("RIGHT")
                     elif direction != 'left':
                         pyautogui.press('left')
-                        print("LEFT\n")
+                        print("LEFT")
                         direction = 'left'
 
         cv2.putText(frame, direction, (20,40), cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),3)
@@ -157,6 +157,8 @@ def color_tracker():
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+        print("Frame: %d, Pts: %d, Contour: %d, dX: %d, dY: %d" %(num_frames, len(pts), len(contours), dX, dY))
 
         
 
