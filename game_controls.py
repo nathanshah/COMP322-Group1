@@ -130,7 +130,7 @@ def color_tracker():
         if num_frames >= 10 and len(pts) >= 10:
             (dX,dY) = tuple(map(lambda i,j: i-j, pts[0], pts[9] ))
 
-            if abs(dX) >= 25 or abs(dY) >= 25:
+            if abs(dX) >= 35 or abs(dY) >= 35:
 
                 if abs(dY) > abs(dX): #up down
                     if dY < 0 and direction != 'up':
