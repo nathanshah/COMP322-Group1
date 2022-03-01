@@ -83,8 +83,8 @@ def color_tracker():
     
 
     # You need to define HSV colour range MAKE CHANGE HERE
-    colorLower = (0,0,0)
-    colorUpper = (187,51,12)
+    colorLower = (29,86,6)
+    colorUpper = (64,255,255)
 
     # set the limit for the number of frames to store and the number that have seen direction change
     buffer = 20
@@ -109,6 +109,7 @@ def color_tracker():
 
         frame = cv2.flip(frame,1)
         frame = imutils.resize(frame, width=600)
+        frame_raw = frame.copy()
         frame = cv2.GaussianBlur(frame, (5,5), 0)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
@@ -130,7 +131,7 @@ def color_tracker():
         if num_frames >= 10 and len(pts) >= 10:
             (dX,dY) = tuple(map(lambda i,j: i-j, pts[0], pts[9] ))
 
-            if abs(dX) >= 35 or abs(dY) >= 35:
+            if abs(dX) >= 100 or abs(dY) >= 100:
 
                 if abs(dY) > abs(dX): #up down
                     if dY < 0 and direction != 'up':
@@ -151,8 +152,8 @@ def color_tracker():
                         print("LEFT")
                         direction = 'left'
 
-        cv2.putText(frame, direction, (20,40), cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),3)
-        cv2.imshow('Game Control Window', frame)
+        cv2.putText(frame_raw, direction, (20,40), cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),3)
+        cv2.imshow('Game Control Window', frame_raw)
         num_frames +=1
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -176,22 +177,26 @@ def finger_tracking():
     vs = mw.WebcamVideoStream().start()
 
     # put your code here
-    num_fingers = 0
-    landmark_list = []
 
-    first_hands = mp.solutions.hands
+    mp_hands = mp.solutions.hands
+    mp_drawing = mp.solutions.drawing_utils
 
-    first_hands.Hands(static_image_mode = False, max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
-    ability_to_draw = mp.solutions.drawing_utils
+    hands = mp_hands.Hands(static_image_mode = False, max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
+    global last_dir
 
     while True:
         frame = vs.read()
 
         frame = cv2.flip(frame,1)
         frame = imutils.resize(frame, width=600)
+        frame_raw = frame.copy()
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        results = first_hands.process(frame)
+        results = hands.process(frame)
+
+        num_fingers = 0
+        landmark_list = []
 
         if not results.multi_hand_world_landmarks:
             continue
@@ -200,21 +205,53 @@ def finger_tracking():
             for id, Im in enumerate(hand_item.landmark):
 
                 (height, width, other) = frame.shape
-                new_x = id * Im.x
-                new_y = id* Im.y
+                new_x = width * Im.x
+                new_y = height * Im.y
 
-                cv2.circle(frame, (new_x,new_y), 3, (255,0,255), cv2.FILLED)
-                landmark_list.append()
+               # cv2.circle(frame, (new_x,new_y), 3, (255,0,255), cv2.FILLED)
+                landmark_list.append((id,new_x,new_y))
+        
+        if len(landmark_list) > 0:
+            if landmark_list[4][1] < landmark_list[3][1]:
+                num_fingers+=1
+            
+            if landmark_list[8][2] < landmark_list[6][2]:
+                num_fingers+=1
+            
+            if landmark_list[12][2] < landmark_list[10][2]:
+                num_fingers+=1
 
+            if landmark_list[16][2] < landmark_list[14][2]:
+                num_fingers+=1
 
+            if landmark_list[20][2] < landmark_list[18][2]:
+                num_fingers+=1
 
+        if num_fingers == 1 and last_dir != 'up':
+            #print("UP")
+            pyautogui.press('up')
+            last_dir = 'up'
+        
+        elif num_fingers == 2 and last_dir != 'down':
+            #print("DOWN")
+            pyautogui.press('down')
+            last_dir = 'down'
 
+        elif num_fingers == 3 and last_dir != 'left':
+            #print("LEFT")
+            pyautogui.press('left')
+            last_dir = 'left'
 
+        elif num_fingers == 4 and last_dir != 'right':
+            #print("RIGHT")
+            pyautogui.press('right')
+            last_dir = 'right'
 
+        cv2.putText(frame_raw,str(int(num_fingers)),(10,70),cv2.FONT_HERSHEY_PLAIN, 3, (255,0,255), 3)
+        cv2.imshow("Image", frame_raw)
 
-
-
-
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 def unique_control():
     # put your code here
