@@ -180,7 +180,20 @@ def finger_tracking():
 
 def unique_control():
     # put your code here
-    pass
+
+    import speech_recognition as sr
+
+    r = sr.Recognizer()
+
+    mic = sr.Microphone()
+
+    while True:
+
+        audio = r.listen(mic)
+        command = r.recognize_google(audio)
+        command.lower()
+
+        print(command)
 
 def main():
     control_mode = input("How would you like to control the game? ")
