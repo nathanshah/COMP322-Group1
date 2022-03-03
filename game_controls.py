@@ -259,21 +259,51 @@ def finger_tracking():
 
 def unique_control():
     # put your code here
+    # pyaudio may not be able to be downloaded 
+    # pip install pipwin
+    # pip install pyaudio
+    # instuctions on how to do this found by watching
+    # 1) https://www.youtube.com/watch?v=K_WbsFrPUCk
+    # 2) https://www.youtube.com/watch?v=dNMIdxWFfGg
 
-    import speech_recognition as sr
+   import speech_recognition as sr
+   import pyttsx3
 
-    r = sr.Recognizer()
+   engine = pyttsx3.init()
+   engine.setProperty('voice', 'com.apple.speech.synthesis.voice.samantha')
 
-    mic = sr.Microphone()
+   global last_dir
 
-    while True:
+   r = sr.Recognizer()
 
-        audio = r.listen(mic)
-        command = r.recognize_google(audio)
-        command.lower()
+   with sr.Microphone() as source:
 
-        print(command)
+       while True:
+           audio = r.listen(source)
 
+           try:
+               command = r.recognize_google(audio)
+
+               #print(command)
+
+               if command == 'up' and last_dir != 'up':
+                   pyautogui.press('up')
+               elif command == 'down' and last_dir != 'down':
+                   pyautogui.press('down')
+               elif command == 'left' and last_dir != 'left':
+                    pyautogui.press('left')
+               elif command == 'right' and last_dir != 'right':
+                    pyautogui.press('right')
+               elif command == 'stop':
+                   break
+               else:
+                    engine.say("Do not understand command")
+                    engine.runAndWait()
+
+           except:
+               engine.say("Do not understand command")
+               engine.runAndWait()
+               
 def main():
     control_mode = input("How would you like to control the game? ")
     if control_mode == '1':
